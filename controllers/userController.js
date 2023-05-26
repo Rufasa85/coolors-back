@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {User} = require('../models');
+const {User, Pallet} = require('../models');
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt");
 
@@ -78,7 +78,9 @@ router.get("/profile",(req,res)=>{
     const token = req.headers.authorization?.split(" ")[1];
     try {
         const data = jwt.verify(token,process.env.JWT_SECRET)
-        User.findByPk(data.userId).then(foundUser=>{
+        User.findByPk(data.userId,{
+            include:[Pallet]
+        }).then(foundUser=>{
             res.json(foundUser)
         })
     } catch (err) {
