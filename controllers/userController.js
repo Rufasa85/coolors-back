@@ -73,8 +73,8 @@ router.post("/login",(req,res)=>{
     })
 })
 
-// get profile
-router.get("/profile",(req,res)=>{
+
+router.get("/verifytoken",(req,res)=>{
     const token = req.headers.authorization?.split(" ")[1];
     try {
         const data = jwt.verify(token,process.env.JWT_SECRET)
