@@ -29,6 +29,31 @@ router.get('/',(req,res)=>{
         res.status(500).json({msg:"womp womp",err})
     })
 })
+//find one
+router.get('/:id',(req,res)=>{
+    Pallet.findByPk(req.params.id,{
+        include:[User]
+    }).then(pal=>{
+        if(!pal){
+            return res.status(404).json({msg:"no such pallet"})
+        }
+        const plainData = pal.get({plain:true});
+        const harmonies = colord.colord(plainData.seedColor).harmonies("tetradic").map(col=>{
+            return {
+                color:col.toHex(),
+                isDark:col.isDark()
+            }
+        })
+        // console.log(withPallets)
+        res.json({
+            ...plainData,
+            harmonies
+        })
+    }).catch(err=>{
+        console.log(err);
+        res.status(500).json({msg:"womp womp",err})
+    })
+})
 //create
 router.post("/",(req,res)=>{
     const token = req.headers.authorization?.split(" ")[1];
