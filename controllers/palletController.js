@@ -2,13 +2,28 @@ const express = require('express');
 const router = express.Router();
 const {User,Pallet} = require('../models');
 const jwt = require("jsonwebtoken")
-
+const colord = require("colord")
+const harmonies = require("colord/plugins/harmonies")
+colord.extend([harmonies])
 //findall
 router.get('/',(req,res)=>{
     Pallet.findAll({
         include:[User]
     }).then(pals=>{
-        res.json(pals)
+        const withPallets = pals.map(pal=>pal.get({plain:true})).map(pal=>{
+            const harmonies = colord.colord(pal.seedColor).harmonies("tetradic").map(col=>{
+                return {
+                    color:col.toHex(),
+                    isDark:col.isDark()
+                }
+            })
+            return {
+                ...pal,
+                harmonies
+            }
+        })
+        // console.log(withPallets)
+        res.json(withPallets)
     }).catch(err=>{
         console.log(err);
         res.status(500).json({msg:"womp womp",err})
