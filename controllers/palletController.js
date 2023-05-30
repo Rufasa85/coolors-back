@@ -75,4 +75,56 @@ router.post("/",(req,res)=>{
     }
 })
 
+//edit
+router.put("/:id", async (req,res)=>{
+    const token = req.headers.authorization?.split(" ")[1];
+    try {
+        const data = jwt.verify(token,process.env.JWT_SECRET)
+        const pallet = await Pallet.findByPk(req.params.id);
+        console.log('data: ',data)
+        console.log('==============================')
+        console.log('pallet: ',pallet)
+        console.log('------------------------------')
+        if(pallet.UserId!==data.userId){
+            throw new Error("not your pallet!")
+        } else {
+            const updatedPal = await Pallet.update(req.body,{
+                where:{
+                    id:req.params.id
+                }
+            })
+            res.json(updatedPal)
+        }
+    } catch (err) {
+        console.log(err);
+        res.status(403).json({msg:"bad token or not your pallet",err})
+    }
+})
+
+//delete
+router.delete("/:id",async (req,res)=>{
+    const token = req.headers.authorization?.split(" ")[1];
+    try {
+        const data = jwt.verify(token,process.env.JWT_SECRET)
+        const pallet = await Pallet.findByPk(req.params.id);
+        console.log('data: ',data)
+        console.log('==============================')
+        console.log('pallet: ',pallet)
+        console.log('------------------------------')
+        if(pallet.UserId!==data.userId){
+            throw new Error("not your pallet!")
+        } else {
+            const delPal = await Pallet.destroy({
+                where:{
+                    id:req.params.id
+                }
+            })
+            res.json(delPal);
+        }
+    } catch (err) {
+        console.log(err);
+        res.status(403).json({msg:"bad token or not your pallet",err})
+    }
+})
+
 module.exports = router;
